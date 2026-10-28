@@ -1,0 +1,176 @@
+
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CALCULADORA DE HORAS </title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 24px;
+    font-family: Arial, sans-serif;
+    background: #f3f0e9; color: #18233c;
+  }
+  main {
+    max-width: 600px; margin: auto;
+    background: white; padding: 26px;
+    border-radius: 22px;
+    box-shadow: 0 8px 30px #0001;
+  }
+  h1 { text-align: center; font-size: 30px; }
+  .sub { text-align: center; color: #666; }
+  label { display: block; margin-top: 18px; font-weight: bold; }
+  select, input {
+    width: 100%; padding: 13px; margin-top: 7px;
+    border: 1px solid #ccd1dc; border-radius: 10px;
+    background: white; font-size: 16px;
+  }
+  button {
+    width: 100%; margin-top: 24px; padding: 16px;
+    background: #2479e8; color: white; border: none;
+    border-radius: 12px; font-size: 17px;
+    font-weight: bold; cursor: pointer;
+  }
+  button:hover { background: #155fc2; }
+  #resultado {
+    display: none; margin-top: 24px; padding: 22px;
+    background: #fff0ef; border-radius: 16px;
+    text-align: center;
+  }
+  .horas { font-size: 48px; font-weight: bold; color: #d91d46; }
+  #comentario { font-size: 18px; line-height: 1.5; }
+  .nota { color: #777; font-size: 12px; text-align: center; margin-top: 20px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>CALCULADORA DE DESCUENTO DE HORAS</h1>
+ 
+
+  <label for="departamento">1. Departamento</label>
+  <select id="departamento">
+    <option>CONTINUIDAD</option>
+    <option>CAMBIO DE FORMATOS</option>
+    <option>CONTROL CENTRAL</option>
+    <option>TRÁFICO</option>
+  </select>
+
+  <label for="turno">2. Turno</label>
+  <select id="turno">
+    <option>CTM</option>
+    <option>CTT</option>
+    <option>CTN</option>
+    <option>CFM</option>
+    <option>CFT</option>
+    <option>TM</option>
+    <option>TT</option>
+    <option>CCM</option>
+    <option>CCT</option>
+    <option>Fin de semana</option>
+  </select>
+
+  <label for="solicitadas">3. Horas solicitadas</label>
+  <input id="solicitadas" type="number" min="0.5"
+         max="100" step="0.5" value="8">
+
+  <button onclick="calcular()">🎲 CALCULAR HORAS A DESCONTAR</button>
+
+  <section id="resultado" aria-live="polite">
+    <h2>📢 DECISIÓN DE LA EMPRESA</h2>
+    <p id="datos"></p>
+    <div>Horas descontadas:</div>
+    <div class="horas" id="horas">0 h</div>
+    <p id="comentario"></p>
+    <button onclick="calcular()">INTRODUCE EL CUPÓN DE DESCUENTO</button>
+    <button onclick="compartir()" style="background:#26354d">
+      📲 COMPARTIR RESULTADO
+    </button>
+  </section>
+
+  <p class="nota">Calculadora de horas.</p>
+</main>
+
+<script>
+const comentarios = [
+  "SI TU NOMBRE EMPIEZA POR M Y ACABA POR U, IMPOSIBLE LIBRAR UN SÁBADO",
+  "За чрезмерную уверенность при заполнении заявления",
+  "Por solicitar horas con demasiada antelación. Se descuentan el doble por previsión excesiva",
+  "Se ha detectado un exceso de productividad",
+  "بسبب الثقة المفرطة عند تقديم الطلب.",
+  "Descuento por desgaste de pupilas",
+  "Aplicando el IPC",
+  "Es un abuso",
+  "Haberte dado más prisa",
+  "Si me las hubieras pedido ayer, te habría descontado menos",
+  "Descuento por exceso de puntualidad",
+  "haber estudiao",
+  "Te descuento las horas que has estado mirando el teléfono",
+
+];
+
+let ultimoResultado = "";
+
+function calcular() {
+  const departamento = document.getElementById("departamento").value;
+  const turno = document.getElementById("turno").value;
+  const horas = Number(document.getElementById("solicitadas").value);
+
+  if (!Number.isFinite(horas) || horas < 0.5 || horas > 100) {
+    alert("Introduce entre 0,5 y 100 horas.");
+    return;
+  }
+
+  // Descuento aleatorio en bloques de media hora.
+  const bloques = Math.floor(horas * 2);
+
+// La empresa siempre GANA
+const extra = Math.floor(Math.random() * 10) + 1;
+const descontadas = horas + extra;
+  const comentario =
+    comentarios[Math.floor(Math.random() * comentarios.length)];
+
+  document.getElementById("datos").textContent =
+    departamento + " · Turno de " + turno +
+    " · Solicitadas: " + horas + " h";
+
+  document.getElementById("horas").textContent =
+    descontadas.toLocaleString("es-ES") + " h";
+
+  document.getElementById("comentario").textContent = comentario;
+
+  document.getElementById("resultado").style.display = "block";
+
+  ultimoResultado =
+    "😂 CALCULADORA DE DESCUENTOS\n" +
+    "Departamento: " + departamento + "\n" +
+    "Turno: " + turno + "\n" +
+    "Horas solicitadas: " + horas + "\n" +
+    "Horas descontadas: " + descontadas + "\n" +
+    comentario + "\n\n" +
+    "Resultado verídico, confirme con su coordinador.";
+
+  document.getElementById("resultado").scrollIntoView({
+    behavior: "smooth", block: "nearest"
+  });
+}
+
+async function compartir() {
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: "Mi descuento laboral",
+                              text: ultimoResultado });
+    } catch (e) {}
+  } else {
+    try {
+      await navigator.clipboard.writeText(ultimoResultado);
+      alert("¡Resultado copiado! Ya puedes enviarlo por WhatsApp.");
+    } catch (e) {
+      alert(ultimoResultado);
+    }
+  }
+}
+</script>
+</body>
+</html>
